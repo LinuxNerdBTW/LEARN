@@ -1,0 +1,20 @@
+#!/usr/bin/python3
+import requests
+from bs4 import BeautifulSoup
+from termcolor import colored, cprint
+
+URL = "https://english.hamropatro.com/"
+web_data = requests.get(URL).text
+soup = BeautifulSoup(web_data, "lxml")
+date_ = soup.find("span",class_="nep").text
+event_ = soup.find("div", class_="events").text
+time_ = soup.find("div", class_="time").text
+event_colored = colored(event_, 'cyan', attrs=['bold'])
+date_colored = colored(date_, 'cyan', attrs=['bold'])
+time_colored = colored(time_, 'cyan', attrs=['bold'])
+
+print(date_colored)
+print(time_colored)
+print(event_colored)
+
+

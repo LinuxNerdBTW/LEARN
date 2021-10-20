@@ -1,0 +1,147 @@
+#!/usr/bin/bash
+
+if [ $1 == "start_" ]
+then 
+	echo "...........CHECKING SERVICE IS RUNNING OR NOT.............." 
+
+	sudo systemctl status docker | grep -i Active: --color=auto | column 
+
+	echo "[0] Start Docker Service if inactive or dead "
+	echo "[1] Continue "
+	echo "👉 "
+	read choice
+	if [ $choice -eq 0 ]
+	then
+		echo "STARTING ....."
+		sudo systemctl start docker
+
+	elif [ $choice -eq 1 ]
+	then 
+		echo "[0] DEATTACHED MODE"
+		echo "[1] JUST RUN IT AND REMOVE ON EXIT"
+		echo "👉 " 
+		read choice 
+		
+		if [ $choice -eq 0 ]
+		then 
+			sudo docker images
+			echo "REPOSITORY NAME WITH TAG 👉 "
+			read repo_name
+			echo "SELECT SHELL : "
+			echo "[0] BASH"
+			echo "[1] ZSH"
+			echo "👉 "
+			read shell_
+			if [ $shell_ -eq 0 ]
+			then
+				sudo docker run -it -d --network host $repo_name /usr/bin/bash
+				echo "Do you want to execute container or not [ yes or no ] 👉 "
+				read decision_
+				if [ $decision_ == "yes" ]
+				then
+					echo "Executing container ... "
+					sudo docker ps -a 
+					echo "COPY AND PASTE CONTAINER ID FROM ABOVE 👉 "
+					read container_id
+					sudo docker exec -it $container_id /usr/bin/bash
+					echo "Docker Container Executed SuccessFully 😛"
+				else
+					echo "Bye World 😝"
+					exit
+				fi
+			elif [ $shell_ -eq 1 ]
+			then
+				sudo docker run -it -d --network host $repo_name /usr/bin/zsh
+				echo "Do you want to execute container or not [ yes or no ] 👉 "
+				read decision_
+				if [ $decision_ == "yes" ]
+				then
+					echo "Executing container ... "
+					sudo docker ps -a
+					echo "COPY AND PASTE CONTAINER ID FROM ABOVE 👉 "
+					read container_id
+					sudo docker exec -it $container_id /usr/bin/zsh
+					echo "Dcoker Container Executed SuccessFully 😛"
+				else
+					echo "Bye World 😝"
+					exit
+				fi
+			else
+				echo "Invalid Input 😤😤😤 "
+			fi
+
+		elif [ $choice -eq 1 ]
+		then 
+			sudo docker images
+			echo "REPOSITORY NAME WITH TAG 👉 "
+			read repo_name
+			echo "SELECT SHELL : "
+			echo "[0] BASH"
+			echo "[1] ZSH"
+			echo "👉 "
+			read shell_
+			if [ $shell_ -eq 0 ]
+			then
+				sudo docker run -it --rm --network host $repo_name /usr/bin/bash
+			elif [ $shell_ -eq 1 ]
+			then
+				sudo docker run -it --rm --network host $repo_name /usr/bin/zsh
+			else
+				echo "Invalid Input 😤😤😤 "
+			fi
+
+		else
+			echo "Invalid Input 😤😤😤"
+		fi
+	
+	else
+		echo "Invalid input 😤😤😤 "
+	fi
+
+
+
+elif [ $1 == "save_" ]
+then 
+	sudo docker ps -a
+	echo "CONTAINER ID 👉 "
+	read container_id
+	sudo docker diff $container_id
+
+	sudo docker stop $container_id 
+
+	echo "SAVING 😛😛😛"
+	sudo docker images
+	
+	echo "REPOSITORY NAME WITH TAG 👉 "
+	read repo_name_1
+	sudo docker commit $container_id $repo_name_1
+
+	echo "REMOVING OLD CONTAINER 😛😛😛"
+	sudo docker ps -a
+	echo "CONTAINER ID 👉 "
+	read container_id_
+	sudo docker rm $container_id_
+
+	echo "REMOVING OLD IMAGE 😛😛😛"
+	sudo docker images
+	echo "REPOSITORY NAME WITH TAG 👉 "
+	read repo_name_ 
+	sudo docker rmi $repo_name_
+	
+	sudo docker images
+
+elif [ $1 == "stop_" ]
+then
+	sudo docker ps -a
+	echo "CONTAINER ID 👉 "
+	read container_id_
+	echo "STOPPING 😛😛😛"
+	sudo docker stop $container_id_ 
+	echo "REMOVING 😛😛😛"
+	sudo docker rm $container_id_
+	echo "Done 😛😛😛"
+	
+else
+	echo "Exiting 😛😛😛"
+
+fi
