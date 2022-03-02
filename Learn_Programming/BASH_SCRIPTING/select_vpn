@@ -1,0 +1,8 @@
+#!/bin/bash
+
+vpn_=$(ls -l ~/.config/bspwm/bin/vpn/*.ovpn | awk '{print $9}' | rofi -dmenu -p  "SELECT OPENVPN CONFIGURATION : " -theme ~/.config/bspwm/rofi-collection/nord/nord.rasi)
+
+## runnning openvpn with tmux deattached session 
+
+tmux new -s "OPENVPN" -d "echo elliot | sudo -S openvpn --config $vpn_"
+
